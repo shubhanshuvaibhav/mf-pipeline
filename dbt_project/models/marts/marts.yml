@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: dim_fund
+    description: "One current descriptive record per tracked mutual fund scheme."
+    columns:
+      - name: fund_key
+        description: "Deterministic technical key for the fund."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: scheme_code
+        description: "Source identifier for the mutual fund scheme."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: fund_name
+        description: "Current display name of the mutual fund scheme."
+        data_tests:
+          - not_null
+
+      - name: asset_management_company_name
+        description: "Asset management company responsible for the scheme."
+        data_tests:
+          - not_null
+
+  - name: fct_fund_performance
+    description: "One row per scheme and NAV date. Returns compare each NAV with the previous available observation, while the rolling average uses the previous 30 observations."
+    columns:
+      - name: fund_key
+        description: "MD5 Hash Surrogate Key uniquely identifying the mutual fund asset."
+        data_tests:
+          - not_null
+          - relationships:
+              to: ref('dim_fund')
+              field: fund_key
+
+      - name: nav_date
+        description: "The calendar date associated with the historical closing transaction ledger window."
+        data_tests:
+          - not_null
+
+      - name: net_asset_value_inr
+        description: "Closing asset unit valuation metric tracking currency balances."
+        data_tests:
+          - not_null

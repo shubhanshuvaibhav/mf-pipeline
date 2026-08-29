@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: bronze_source
+    schema: bronze
+    tables:
+      - name: raw_dump
+        loaded_at_field: ingested_at
+        freshness:
+          warn_after:
+            count: 1
+            period: day
+          error_after:
+            count: 2
+            period: day

@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+  # Service 1: The PostgreSQL Database
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres/init:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
+
+  # Service 2: The Apache Airflow
+  airflow:
+    build: ./airflow
+    container_name: airflow
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - AIRFLOW_CONN_POSTGRES_DEFAULT=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - SCHEME_CODES=${SCHEME_CODES}
+      - AIRFLOW_ADMIN_USERNAME=${AIRFLOW_ADMIN_USERNAME}
+      - AIRFLOW_ADMIN_PASSWORD=${AIRFLOW_ADMIN_PASSWORD}
+      - AIRFLOW_ADMIN_EMAIL=${AIRFLOW_ADMIN_EMAIL}
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./tests:/opt/airflow/tests
+      - ./dbt_project:/opt/airflow/dbt_project
+      - ./data:/opt/airflow/data
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    command: bash -c "airflow db init && airflow users create --username \"$$AIRFLOW_ADMIN_USERNAME\" --firstname Admin --lastname User --role Admin --email \"$$AIRFLOW_ADMIN_EMAIL\" --password \"$$AIRFLOW_ADMIN_PASSWORD\" || true; airflow webserver & airflow scheduler"
+
+volumes:
+  postgres_data:

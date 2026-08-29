@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: stg_mf_nav
+    description: "Deduplicated and typed NAV observations at one row per scheme and NAV date. The newest ingestion snapshot wins when the API history is repeated."
+    columns:
+      - name: fund_key
+        description: "Deterministic technical key derived from the source scheme code."
+        data_tests:
+          - not_null
+
+      - name: scheme_code
+        description: "Source identifier for the mutual fund scheme."
+        data_tests:
+          - not_null
+
+      - name: fund_name
+        description: "Display name of the mutual fund scheme."
+        data_tests:
+          - not_null
+
+      - name: asset_management_company_name
+        description: "Asset management company responsible for the scheme."
+        data_tests:
+          - not_null
+
+      - name: nav_date
+        description: "Date of the published NAV observation."
+        data_tests:
+          - not_null
+
+      - name: net_asset_value_inr
+        description: "NAV per unit in Indian rupees."
+        data_tests:
+          - not_null
