@@ -5,7 +5,7 @@ A data pipeline that pulls mutual fund NAV data from MFAPI, transforms and organ
 
 ## Architecture
 
-![Architecture diagram](architecture-diagram.drawio.svg)
+![Architecture diagram](docs/architecture-diagram.drawio.svg)
 
 ## Overview
 
